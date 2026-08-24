@@ -46,3 +46,6 @@
 - [x] Définir les variables d’environnement requises dans la documentation de déploiement.
 - [x] Configurer les redirections Netlify entre le frontend et les fonctions serveur.
 - [x] Tester la construction de production compatible avec Netlify et documenter le déploiement depuis GitHub.
+- [x] Ajouter un paramètre de vue dans l’URL afin de présenter directement les écrans mobile de pointage et d’espace membre.
+- [x] Capturer les écrans mobile Pointage et Espace membre pour validation visuelle.
+- [x] Ajouter un mode de prévisualisation visuelle de l’espace membre, sans données persistantes de démonstration.

@@ -36,6 +36,19 @@ import { useEffect, useMemo, useState } from "react";
 type View = "dashboard" | "members" | "contributions" | "treasury" | "goudi" | "attendance";
 type MemberStatus = "À jour" | "En attente" | "En retard";
 
+const availableViews: View[] = ["dashboard", "members", "contributions", "treasury", "goudi", "attendance"];
+
+function getInitialView(): View {
+  if (typeof window === "undefined") return "dashboard";
+  const requested = new URLSearchParams(window.location.search).get("view") as View | null;
+  return requested && availableViews.includes(requested) ? requested : "dashboard";
+}
+
+function getMemberPreviewMode() {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).get("preview") === "member";
+}
+
 type Member = {
   id: string;
   name: string;
@@ -143,7 +156,8 @@ function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: s
 }
 
 export default function Home() {
-  const [view, setView] = useState<View>("dashboard");
+  const [view, setView] = useState<View>(getInitialView);
+  const [isMemberPreview] = useState(getMemberPreviewMode);
   const [role, setRole] = useState<AppRole>("member");
   const [members, setMembers] = useState<Member[]>([]);
   const [memberSessionToken, setMemberSessionToken] = useState("");
@@ -271,6 +285,9 @@ export default function Home() {
 
   const selectView = (nextView: View) => {
     setView(nextView);
+    const nextUrl = new URL(window.location.href);
+    nextUrl.searchParams.set("view", nextView);
+    window.history.replaceState({}, "", nextUrl);
     setIsMobileMenuOpen(false);
   };
 
@@ -466,7 +483,7 @@ export default function Home() {
           {activeDataLoading && <div className="mb-5 flex items-center gap-3 rounded-2xl border border-[#e9dfcd] bg-[#fffaf0] px-4 py-3 text-sm font-medium text-[#6f7867]"><span className="h-4 w-4 animate-spin rounded-full border-2 border-[#0c5a48] border-t-transparent" />Mise à jour des informations du Dahira…</div>}
           {activeDataError && <div className="mb-5 rounded-2xl border border-[#f0d6cc] bg-[#fff4f0] px-4 py-3 text-sm text-[#9d513b]">Impossible de charger certaines informations. Vérifiez votre connexion puis réessayez.</div>}
 
-          {view === "dashboard" && <Dashboard role={role} hasMemberSession={hasMemberSession} organizer={organizer} metrics={dashboardMetrics} checkInOpen={checkInOpen} notificationsEnabled={notificationsEnabled} notificationFeedback={notificationFeedback} onNavigate={selectView} onEnableNotifications={() => void requestNotifications()} />}
+          {view === "dashboard" && <Dashboard role={role} hasMemberSession={hasMemberSession} isMemberPreview={isMemberPreview} organizer={organizer} metrics={dashboardMetrics} checkInOpen={checkInOpen} notificationsEnabled={notificationsEnabled} notificationFeedback={notificationFeedback} onNavigate={selectView} onEnableNotifications={() => void requestNotifications()} />}
           {view === "members" && <MembersPage members={filteredMembers} requests={accountRequests} search={search} onSearch={setSearch} onOpenAdd={() => setShowJoinForm(true)} onSelect={setSelectedMember} onApprove={approveRequest} onReject={rejectRequest} />}
           {view === "contributions" && <ContributionsPage canManage={role !== "member"} members={members} records={contributionQuery.data} onOpenRecord={() => { setRecordModal("contribution"); setRecordMemberId(""); setRecordAmount("2000"); }} remindedMembers={remindedMembers} onRemind={name => setRemindedMembers(previous => [...previous, name])} />}
           {view === "treasury" && <TreasuryPage canManage={role !== "member"} records={treasuryQuery.data} onOpenRecord={() => { setRecordModal("treasury"); setRecordAmount(""); setRecordCategory("Cotisation"); setRecordDescription(""); setRecordKind("income"); }} />}
@@ -496,7 +513,7 @@ export default function Home() {
   );
 }
 
-function Dashboard({ role, hasMemberSession, organizer, metrics, checkInOpen, notificationsEnabled, notificationFeedback, onNavigate, onEnableNotifications }: { role: AppRole; hasMemberSession: boolean; organizer: Member; metrics: { memberCount: number; received: number; expected: number; treasury: number; attendanceCount: number; paidCount: number; pendingCount: number; lateCount: number }; checkInOpen: boolean; notificationsEnabled: boolean; notificationFeedback: string; onNavigate: (view: View) => void; onEnableNotifications: () => void }) {
+function Dashboard({ role, hasMemberSession, isMemberPreview, organizer, metrics, checkInOpen, notificationsEnabled, notificationFeedback, onNavigate, onEnableNotifications }: { role: AppRole; hasMemberSession: boolean; isMemberPreview: boolean; organizer: Member; metrics: { memberCount: number; received: number; expected: number; treasury: number; attendanceCount: number; paidCount: number; pendingCount: number; lateCount: number }; checkInOpen: boolean; notificationsEnabled: boolean; notificationFeedback: string; onNavigate: (view: View) => void; onEnableNotifications: () => void }) {
   return <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
     <div className="mb-7 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between"><div><p className="eyebrow">Bonjour, Abdou</p><h1 className="display mt-1 text-3xl tracking-tight text-[#123e32] sm:text-4xl">Le Dahira en un regard.</h1><p className="mt-2 max-w-xl text-sm leading-6 text-[#647a6f]">Suivez les activités, les cotisations et l’organisation du prochain Goudi simplement.</p></div><button onClick={() => onNavigate("goudi")} className="soft-button w-fit bg-[#073d32] text-white shadow-[0_12px_20px_-15px_rgba(7,61,50,0.7)]">Préparer jeudi prochain <ArrowUpRight className="h-4 w-4" /></button></div>
 
@@ -506,7 +523,8 @@ function Dashboard({ role, hasMemberSession, organizer, metrics, checkInOpen, no
       <Metric icon={WalletCards} label="Solde de caisse" value={money(metrics.treasury)} note="mouvements enregistrés" tone="green" />
       <Metric icon={UserCheck} label="Participation" value={String(metrics.attendanceCount)} note="pointage(s) enregistré(s)" tone="terracotta" />
     </div>
-    {!hasMemberSession && <div className="mt-4 rounded-2xl border border-[#e6dcc7] bg-[#fffaf0] p-4 text-sm leading-6 text-[#6f776c]">Connectez-vous avec votre numéro et votre code secret pour afficher les données réelles de votre Dahira. Le premier compte inscrit devient administrateur.</div>}
+    {isMemberPreview && <div className="mt-4 rounded-2xl border border-[#cfe4d3] bg-[#eef7ef] p-4 text-sm leading-6 text-[#35634a]"><b>Aperçu espace membre.</b> Le membre accède à son pointage, ses cotisations, le prochain Goudi et ses notifications ; la caisse et les données des autres membres restent privées.</div>}
+    {!hasMemberSession && !isMemberPreview && <div className="mt-4 rounded-2xl border border-[#e6dcc7] bg-[#fffaf0] p-4 text-sm leading-6 text-[#6f776c]">Connectez-vous avec votre numéro et votre code secret pour afficher les données réelles de votre Dahira. Le premier compte inscrit devient administrateur.</div>}
 
     <div className="mt-6 grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
       <section className="surface-card overflow-hidden">
