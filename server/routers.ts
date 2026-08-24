@@ -3,7 +3,9 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { approveAccount, getAccountForSession, listPendingAccounts, loginMemberAccount, registerMemberAccount, rejectAccount, requireAdmin, setMemberAccountRole } from "./memberAuth";
+import { approveAccount, getAccountForSession, getMemberTokenFromCookie, listPendingAccounts, loginMemberAccount, registerMemberAccount, rejectAccount, requireAdmin, setMemberAccountRole } from "./memberAuth";
+import { dahiraRouter } from "./dahiraData";
+import { webPushRouter } from "./webPush";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -24,12 +26,15 @@ export const appRouter = router({
       const account = await registerMemberAccount(input);
       return { id: account.id, status: account.status, role: account.role, firstAdmin: account.role === "admin" };
     }),
-    login: publicProcedure.input(z.object({ phone: z.string().min(7).max(32), secret: z.string().min(4).max(128) })).mutation(async ({ input }) => {
+    login: publicProcedure.input(z.object({ phone: z.string().min(7).max(32), secret: z.string().min(4).max(128) })).mutation(async ({ input, ctx }) => {
       const { token, account } = await loginMemberAccount(input.phone, input.secret);
-      return { token, account: { id: account.id, name: account.name, phone: account.phone, role: account.role, status: account.status } };
+      ctx.res.cookie("dahira_member_session", token, { httpOnly: true, sameSite: "lax", secure: ctx.req.protocol === "https", path: "/", maxAge: 1000 * 60 * 60 * 24 * 30 });
+      return { account: { id: account.id, name: account.name, phone: account.phone, role: account.role, status: account.status } };
     }),
-    me: publicProcedure.input(z.object({ token: z.string().min(1) })).query(async ({ input }) => {
-      const account = await getAccountForSession(input.token);
+    me: publicProcedure.input(z.object({ token: z.string().optional() })).query(async ({ input, ctx }) => {
+      const token = input.token || getMemberTokenFromCookie(ctx.req.headers.cookie);
+      if (!token) return null;
+      const account = await getAccountForSession(token);
       if (!account) return null;
       return { id: account.id, name: account.name, phone: account.phone, role: account.role, status: account.status };
     }),
@@ -53,6 +58,8 @@ export const appRouter = router({
       return { success: true } as const;
     }),
   }),
+  dahira: dahiraRouter,
+  webPush: webPushRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({

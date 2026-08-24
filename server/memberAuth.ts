@@ -9,6 +9,12 @@ const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30;
 
 export type MemberRole = "admin" | "treasurer" | "member";
 
+export function getMemberTokenFromCookie(cookieHeader?: string) {
+  if (!cookieHeader) return undefined;
+  const matched = cookieHeader.split(";").map(item => item.trim()).find(item => item.startsWith("dahira_member_session="));
+  return matched ? decodeURIComponent(matched.slice("dahira_member_session=".length)) : undefined;
+}
+
 function normalizePhone(phone: string) {
   return phone.replace(/[^0-9+]/g, "");
 }

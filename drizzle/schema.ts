@@ -34,6 +34,9 @@ export const memberAccounts = mysqlTable("memberAccounts", {
   status: mysqlEnum("status", ["pending", "approved", "rejected"]).default("pending").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   approvedAt: timestamp("approvedAt"),
+  responsibility: varchar("responsibility", { length: 120 }).default("Membre actif").notNull(),
+  active: int("active").default(1).notNull(),
+  rotationIndex: int("rotationIndex").default(0).notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
@@ -42,6 +45,63 @@ export const memberSessions = mysqlTable("memberSessions", {
   accountId: int("accountId").notNull(),
   tokenHash: varchar("tokenHash", { length: 255 }).notNull().unique(),
   expiresAt: timestamp("expiresAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const contributions = mysqlTable("contributions", {
+  id: int("id").autoincrement().primaryKey(),
+  memberAccountId: int("memberAccountId").notNull(),
+  period: varchar("period", { length: 32 }).notNull(),
+  expectedAmount: int("expectedAmount").notNull(),
+  paidAmount: int("paidAmount").default(0).notNull(),
+  status: mysqlEnum("status", ["paid", "pending", "late"]).default("pending").notNull(),
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const treasuryTransactions = mysqlTable("treasuryTransactions", {
+  id: int("id").autoincrement().primaryKey(),
+  kind: mysqlEnum("kind", ["income", "expense"]).notNull(),
+  category: varchar("category", { length: 80 }).notNull(),
+  amount: int("amount").notNull(),
+  description: varchar("description", { length: 255 }).notNull(),
+  occurredAt: timestamp("occurredAt").defaultNow().notNull(),
+  createdByAccountId: int("createdByAccountId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const goudiEvents = mysqlTable("goudiEvents", {
+  id: int("id").autoincrement().primaryKey(),
+  scheduledFor: timestamp("scheduledFor").notNull(),
+  organizerAccountId: int("organizerAccountId"),
+  contributionExpected: int("contributionExpected").default(10000).notNull(),
+  status: mysqlEnum("status", ["proposed", "confirmed", "completed"]).default("proposed").notNull(),
+  createdByAccountId: int("createdByAccountId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const attendanceRecords = mysqlTable("attendanceRecords", {
+  id: int("id").autoincrement().primaryKey(),
+  memberAccountId: int("memberAccountId").notNull(),
+  eventDate: timestamp("eventDate").notNull(),
+  checkedInAt: timestamp("checkedInAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const webPushSubscriptions = mysqlTable("webPushSubscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  accountId: int("accountId").notNull(),
+  endpoint: text("endpoint").notNull(),
+  p256dh: varchar("p256dh", { length: 255 }).notNull(),
+  auth: varchar("auth", { length: 255 }).notNull(),
+  enabled: int("enabled").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const webPushSettings = mysqlTable("webPushSettings", {
+  id: int("id").autoincrement().primaryKey(),
+  publicKey: text("publicKey").notNull(),
+  privateKey: text("privateKey").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

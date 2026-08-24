@@ -15,6 +15,20 @@
       "when": 1787598635960,
       "tag": "0001_first_loners",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787599099573,
+      "tag": "0002_illegal_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1787599748903,
+      "tag": "0003_great_thunderball",
+      "breakpoints": true
     }
   ]
 }
