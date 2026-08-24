@@ -2,6 +2,8 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { z } from "zod";
+import { approveAccount, getAccountForSession, listPendingAccounts, loginMemberAccount, registerMemberAccount, rejectAccount, requireAdmin, setMemberAccountRole } from "./memberAuth";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -14,6 +16,41 @@ export const appRouter = router({
       return {
         success: true,
       } as const;
+    }),
+  }),
+
+  memberAuth: router({
+    register: publicProcedure.input(z.object({ name: z.string().min(2).max(160), phone: z.string().min(7).max(32), secret: z.string().min(4).max(128) })).mutation(async ({ input }) => {
+      const account = await registerMemberAccount(input);
+      return { id: account.id, status: account.status, role: account.role, firstAdmin: account.role === "admin" };
+    }),
+    login: publicProcedure.input(z.object({ phone: z.string().min(7).max(32), secret: z.string().min(4).max(128) })).mutation(async ({ input }) => {
+      const { token, account } = await loginMemberAccount(input.phone, input.secret);
+      return { token, account: { id: account.id, name: account.name, phone: account.phone, role: account.role, status: account.status } };
+    }),
+    me: publicProcedure.input(z.object({ token: z.string().min(1) })).query(async ({ input }) => {
+      const account = await getAccountForSession(input.token);
+      if (!account) return null;
+      return { id: account.id, name: account.name, phone: account.phone, role: account.role, status: account.status };
+    }),
+    pending: publicProcedure.input(z.object({ token: z.string().min(1) })).query(async ({ input }) => {
+      await requireAdmin(input.token);
+      return listPendingAccounts();
+    }),
+    approve: publicProcedure.input(z.object({ token: z.string().min(1), accountId: z.number().int().positive() })).mutation(async ({ input }) => {
+      await requireAdmin(input.token);
+      await approveAccount(input.accountId);
+      return { success: true } as const;
+    }),
+    reject: publicProcedure.input(z.object({ token: z.string().min(1), accountId: z.number().int().positive() })).mutation(async ({ input }) => {
+      await requireAdmin(input.token);
+      await rejectAccount(input.accountId);
+      return { success: true } as const;
+    }),
+    setRole: publicProcedure.input(z.object({ token: z.string().min(1), accountId: z.number().int().positive(), role: z.enum(["admin", "treasurer", "member"]) })).mutation(async ({ input }) => {
+      await requireAdmin(input.token);
+      await setMemberAccountRole(input.accountId, input.role);
+      return { success: true } as const;
     }),
   }),
 

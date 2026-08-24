@@ -1,5 +1,20 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1787597432028,
+      "tag": "0000_melodic_paper_doll",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787598635960,
+      "tag": "0001_first_loners",
+      "breakpoints": true
+    }
+  ]
 }

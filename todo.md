@@ -1,0 +1,38 @@
+# Project TODO
+
+- [x] Définir une identité visuelle mobile-first élégante avec palette vert profond, or doux, ivoire et alertes terracotta.
+- [x] Mettre en place une navigation responsive avec barre inférieure mobile et navigation latérale sur grand écran.
+- [x] Créer le tableau de bord avec indicateurs de membres, cotisations, impayés, caisse, prochain Goudi et régularité.
+- [x] Créer l’écran de connexion et d’inscription par nom, numéro de téléphone et code secret avec état de validation administrateur.
+- [x] Créer la gestion des rôles administrateur, trésorier et membre avec les droits d’interface associés.
+- [x] Créer l’écran des membres avec recherche, statut, responsabilité, contact et fiche individuelle.
+- [x] Créer l’écran des cotisations avec suivi mensuel, états à jour/en attente/en retard et actions de relance.
+- [x] Créer l’écran de caisse avec entrées, sorties, catégories et solde courant.
+- [x] Créer l’écran Goudi Adjouma avec suggestion d’organisateur par rotation, historique et confirmation ou remplacement administrateur.
+- [x] Créer le pointage facultatif disponible uniquement le jeudi entre 21 h et 23 h 59, avec message d’indisponibilité hors créneau.
+- [x] Créer les indicateurs de régularité et l’historique de présence des membres.
+- [x] Ajouter un emplacement d’activation des notifications web sans SMS ni fournisseur payant obligatoire.
+- [ ] Ajouter des états vides, chargement, erreurs et confirmations cohérents dans toutes les vues.
+- [x] Ajouter des tests Vitest pour les règles de rotation, les droits par rôle et le créneau de pointage.
+- [x] Vérifier les vues mobile et bureau avec captures d’écran et corriger les défauts de lisibilité ou de navigation.
+- [x] Préparer la documentation GitHub et les paramètres de déploiement Netlify sans dépendance payante obligatoire.
+- [x] Ajouter un manifeste PWA et un service worker pour permettre l’ajout de l’application à l’écran d’accueil sur téléphone.
+- [x] Relier le bouton de notifications web à la demande d’autorisation du navigateur, avec un état de refus ou d’acceptation clair.
+- [x] Connecter les comptes par numéro et code secret à un stockage sécurisé côté serveur, avec validation persistante par administrateur.
+- [ ] Connecter les membres, cotisations, caisse, Goudi et présences à la base de données pour un usage multi-utilisateur réel.
+- [ ] Configurer un service de notifications web distant pour les rappels automatiques après consentement des membres.
+- [x] Appliquer réellement les droits par rôle à toutes les navigations et actions, y compris la barre mobile.
+- [x] Ajouter une fiche individuelle membre avec son historique de cotisations, de présences et de Goudi.
+- [x] Ajouter une action de relance avec confirmation visuelle dans l’écran cotisations.
+- [x] Relier la suggestion Goudi à l’algorithme de rotation et à l’historique affiché.
+- [x] Ajouter un historique de présence par membre et par date.
+- [x] Finaliser la revue responsive à partir des captures mobile et bureau et documenter les ajustements effectués.
+- [x] Ajouter une persistance locale de démonstration pour les validations d’inscription, les rôles et les fiches membres.
+- [x] Retirer le sélecteur de rôle libre de l’interface afin que les droits ne puissent pas être simulés par n’importe quel utilisateur.
+- [x] Créer les tables de comptes, statuts de validation et sessions pour l’authentification par téléphone et code secret.
+- [x] Bloquer la connexion côté serveur tant que le compte n’a pas été approuvé par un administrateur.
+- [x] Associer le rôle courant à une session validée et appliquer les permissions par procédures côté serveur.
+- [x] Relier la validation administrateur de l’interface aux comptes persistants plutôt qu’au stockage local.
+- [ ] Créer des procédures serveur protégées pour les données métier : membres, cotisations, caisse, Goudi et présences.
+- [ ] Remplacer les données métier locales par des lectures et écritures serveur protégées dans les écrans principaux.
+- [ ] Déplacer le jeton de session membre vers une solution de session HttpOnly avant l’ouverture publique.
