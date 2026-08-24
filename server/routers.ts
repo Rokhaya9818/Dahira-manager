@@ -28,7 +28,7 @@ export const appRouter = router({
     }),
     login: publicProcedure.input(z.object({ phone: z.string().min(7).max(32), secret: z.string().min(4).max(128) })).mutation(async ({ input, ctx }) => {
       const { token, account } = await loginMemberAccount(input.phone, input.secret);
-      ctx.res.cookie("dahira_member_session", token, { httpOnly: true, sameSite: "lax", secure: ctx.req.protocol === "https", path: "/", maxAge: 1000 * 60 * 60 * 24 * 30 });
+      ctx.res.cookie("dahira_member_session", token, { httpOnly: true, sameSite: "lax", secure: process.env.NETLIFY === "true" || ctx.req.protocol === "https", path: "/", maxAge: 1000 * 60 * 60 * 24 * 30 });
       return { account: { id: account.id, name: account.name, phone: account.phone, role: account.role, status: account.status } };
     }),
     me: publicProcedure.input(z.object({ token: z.string().optional() })).query(async ({ input, ctx }) => {

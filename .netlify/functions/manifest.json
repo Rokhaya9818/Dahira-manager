@@ -1,0 +1,1 @@
+{"functions":[{"bundler":"esbuild","buildData":{"runtimeAPIVersion":1},"mainFile":"/home/ubuntu/dahira-manager/netlify/functions/api.ts","name":"api","priority":10,"runtimeVersion":"nodejs22.x","path":"/home/ubuntu/dahira-manager/.netlify/functions/api.zip","runtime":"js"}],"system":{"arch":"x64","platform":"linux"},"timestamp":1787601368979,"version":1}

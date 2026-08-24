@@ -27,9 +27,18 @@ pnpm build
 
 ## Déploiement Netlify
 
-La partie interface peut être publiée avec la commande de build `pnpm build` et le répertoire de publication `dist/public`. Le fichier `netlify.toml` prépare cette configuration. Cependant, l’inscription, la validation administrative et les sessions utilisent le serveur Node et la base de données du projet : pour les conserver sur Netlify, il faudra porter ces procédures vers des Netlify Functions et relier une base de données compatible. En attendant, déployez cette application complète sur un hébergement Node compatible avec la base de données, ou publiez l’interface seule sur Netlify.
+Le projet contient maintenant une fonction Netlify Express dans `netlify/functions/api.ts`. Le fichier `netlify.toml` publie `dist/public`, construit cette fonction et redirige les appels `/api/*` vers elle. Les inscriptions, comptes approuvés, données financières, Goudi, présences et abonnements Push peuvent ainsi être traités côté serveur sur Netlify.
 
-Pour le déploiement depuis GitHub, créez un dépôt, poussez ce code, puis créez un nouveau site dans Netlify en sélectionnant le dépôt. Pour une application avec données réelles, ne conservez jamais les codes secrets ou informations financières seulement dans le navigateur : activez une base de données et des règles d’accès côté serveur avant l’ouverture à tous les membres.
+Avant de déployer, créez une base MySQL ou TiDB accessible depuis Netlify et définissez les variables suivantes dans **Site configuration → Environment variables** :
+
+| Variable | Rôle |
+|---|---|
+| `DATABASE_URL` | Chaîne de connexion MySQL/TiDB utilisée par les comptes et les données du Dahira. |
+| `NODE_VERSION` | Définie à `22` dans `netlify.toml`. |
+
+La base doit recevoir les migrations SQL présentes dans `drizzle/` avant la première utilisation. Ne stockez jamais `DATABASE_URL` dans le dépôt GitHub.
+
+Pour le déploiement depuis GitHub, créez un dépôt, poussez ce code, puis créez un nouveau site dans Netlify en sélectionnant le dépôt. Netlify détectera `netlify.toml` et utilisera automatiquement la commande `pnpm build`. Pour une application avec données réelles, ne conservez jamais les codes secrets ou informations financières seulement dans le navigateur : ils sont hachés et les sessions sont placées dans un cookie HttpOnly.
 
 ## Décisions produit
 

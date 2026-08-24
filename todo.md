@@ -40,3 +40,9 @@
 - [x] Remplacer les métriques et historiques statiques par des agrégats et listes retournés par le serveur.
 - [x] Persister l’ajout et l’édition des membres via procédures serveur protégées.
 - [x] Ne plus renvoyer de jeton de session brut après la connexion membre.
+- [x] Auditer les routes serveur et les dépendances à convertir pour Netlify.
+- [x] Créer des fonctions Netlify pour l’API tRPC, l’authentification et les notifications web.
+- [x] Adapter la connexion à la base de données et les cookies de session à l’environnement Netlify.
+- [x] Définir les variables d’environnement requises dans la documentation de déploiement.
+- [x] Configurer les redirections Netlify entre le frontend et les fonctions serveur.
+- [x] Tester la construction de production compatible avec Netlify et documenter le déploiement depuis GitHub.
