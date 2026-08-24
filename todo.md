@@ -49,3 +49,9 @@
 - [x] Ajouter un paramètre de vue dans l’URL afin de présenter directement les écrans mobile de pointage et d’espace membre.
 - [x] Capturer les écrans mobile Pointage et Espace membre pour validation visuelle.
 - [x] Ajouter un mode de prévisualisation visuelle de l’espace membre, sans données persistantes de démonstration.
+- [x] Vérifier les connexions GitHub et Netlify de l’utilisateur avant publication.
+- [x] Exporter la version validée de Dahira Manager dans un dépôt GitHub de l’utilisateur.
+- [ ] Configurer les variables Netlify et la connexion de base de données requises au fonctionnement serveur.
+- [x] Déployer Dahira Manager sur Netlify et vérifier l’URL publique.
+- [x] Corriger le bundling des dépendances de la fonction API Netlify et vérifier l’accès tRPC publié.
+- [x] Corriger la réécriture tRPC entre les routes publiques `/api/*` et la fonction Netlify publiée.
