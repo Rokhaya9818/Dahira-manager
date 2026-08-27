@@ -1,15 +1,36 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import { createPool, type PoolOptions } from "mysql2";
 import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
+/**
+ * TiDB Cloud Starter exige TLS sur son point d’accès public. Les autres URL
+ * MySQL conservent le comportement existant pour le développement local.
+ */
+export function getDatabasePoolOptions(databaseUrl: string): PoolOptions {
+  const hostname = new URL(databaseUrl).hostname;
+  const options: PoolOptions = {
+    uri: databaseUrl,
+    enableKeepAlive: true,
+    supportBigNumbers: true,
+  };
+
+  if (hostname.endsWith(".tidbcloud.com")) {
+    options.ssl = { minVersion: "TLSv1.2" };
+  }
+
+  return options;
+}
+
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      const pool = createPool(getDatabasePoolOptions(process.env.DATABASE_URL));
+      _db = drizzle({ client: pool });
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;

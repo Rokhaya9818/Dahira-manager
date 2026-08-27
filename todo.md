@@ -51,7 +51,9 @@
 - [x] Ajouter un mode de prévisualisation visuelle de l’espace membre, sans données persistantes de démonstration.
 - [x] Vérifier les connexions GitHub et Netlify de l’utilisateur avant publication.
 - [x] Exporter la version validée de Dahira Manager dans un dépôt GitHub de l’utilisateur.
-- [ ] Configurer les variables Netlify et la connexion de base de données requises au fonctionnement serveur.
+- [x] Configurer les variables Netlify et la connexion de base de données requises au fonctionnement serveur.
+- [x] Adapter la connexion serveur MySQL à TLS pour l’instance TiDB Cloud Starter de production.
+- [x] Vérifier l’inscription et la persistance réelle d’un compte de test sur la base TiDB Cloud reliée à Netlify.
 - [x] Déployer Dahira Manager sur Netlify et vérifier l’URL publique.
 - [x] Corriger le bundling des dépendances de la fonction API Netlify et vérifier l’accès tRPC publié.
 - [x] Corriger la réécriture tRPC entre les routes publiques `/api/*` et la fonction Netlify publiée.
