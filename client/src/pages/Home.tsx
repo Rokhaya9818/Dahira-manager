@@ -1,5 +1,6 @@
 import { getSuggestedOrganizer, isCheckInOpen, type AppRole } from "@shared/dahiraRules";
 import { trpc } from "@/lib/trpc";
+import { getMemberFirstName, getMemberInitials } from "@/lib/memberPresentation";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -69,14 +70,6 @@ type AccountRequest = {
   requestedAt: string;
 };
 
-const initialMembers: Member[] = [
-  { id: "abdou", name: "Abdou Diop", initials: "AD", phone: "77 245 67 18", role: "Administrateur", responsibility: "Coordonnateur", status: "À jour", attendance: "18 / 20", rotation: 1 },
-  { id: "mamadou", name: "Mamadou Fall", initials: "MF", phone: "77 985 41 26", role: "Membre", responsibility: "Membre actif", status: "À jour", attendance: "17 / 20", rotation: 2 },
-  { id: "awa", name: "Awa Ndiaye", initials: "AN", phone: "76 640 19 80", role: "Trésorier", responsibility: "Trésorière", status: "En attente", attendance: "16 / 20", rotation: 3 },
-  { id: "moussa", name: "Moussa Sarr", initials: "MS", phone: "78 310 54 91", role: "Membre", responsibility: "Membre actif", status: "En retard", attendance: "14 / 20", rotation: 4 },
-  { id: "fatou", name: "Fatou Seck", initials: "FS", phone: "77 527 93 45", role: "Membre", responsibility: "Membre actif", status: "À jour", attendance: "15 / 20", rotation: 5 },
-];
-
 const navItems: { id: View; label: string; icon: typeof HomeIcon; adminOnly?: boolean; treasury?: boolean }[] = [
   { id: "dashboard", label: "Tableau de bord", icon: HomeIcon },
   { id: "members", label: "Membres", icon: Users, adminOnly: true },
@@ -86,27 +79,6 @@ const navItems: { id: View; label: string; icon: typeof HomeIcon; adminOnly?: bo
   { id: "attendance", label: "Présences", icon: CalendarCheck2 },
 ];
 
-const organizerHistory = [
-  { memberId: "moussa", scheduledFor: new Date(2026, 7, 13).getTime() },
-  { memberId: "fatou", scheduledFor: new Date(2026, 7, 20).getTime() },
-  { memberId: "abdou", scheduledFor: new Date(2026, 7, 27).getTime() },
-];
-
-const attendanceHistoryByMember: Record<string, { date: string; status: string; time: string }[]> = {
-  abdou: [{ date: "Jeudi 27 août 2026", status: "Présence enregistrée", time: "21:16" }, { date: "Jeudi 20 août 2026", status: "Présence enregistrée", time: "21:08" }, { date: "Jeudi 13 août 2026", status: "Présence enregistrée", time: "21:11" }],
-  mamadou: [{ date: "Jeudi 27 août 2026", status: "Présence enregistrée", time: "21:02" }, { date: "Jeudi 20 août 2026", status: "Présence enregistrée", time: "21:20" }, { date: "Jeudi 13 août 2026", status: "Non pointé", time: "—" }],
-  awa: [{ date: "Jeudi 27 août 2026", status: "Présence enregistrée", time: "21:24" }, { date: "Jeudi 20 août 2026", status: "Non pointé", time: "—" }, { date: "Jeudi 13 août 2026", status: "Présence enregistrée", time: "21:09" }],
-  moussa: [{ date: "Jeudi 27 août 2026", status: "Non pointé", time: "—" }, { date: "Jeudi 20 août 2026", status: "Présence enregistrée", time: "21:36" }, { date: "Jeudi 13 août 2026", status: "Présence enregistrée", time: "21:13" }],
-  fatou: [{ date: "Jeudi 27 août 2026", status: "Présence enregistrée", time: "21:18" }, { date: "Jeudi 20 août 2026", status: "Présence enregistrée", time: "21:22" }, { date: "Jeudi 13 août 2026", status: "Présence enregistrée", time: "21:05" }],
-};
-
-const contributionHistoryByMember: Record<string, { period: string; amount: string; status: MemberStatus }[]> = {
-  abdou: [{ period: "Mars 2026", amount: "2 000 F", status: "À jour" }, { period: "Février 2026", amount: "2 000 F", status: "À jour" }],
-  mamadou: [{ period: "Mars 2026", amount: "2 000 F", status: "À jour" }, { period: "Février 2026", amount: "2 000 F", status: "À jour" }],
-  awa: [{ period: "Mars 2026", amount: "2 000 F", status: "En attente" }, { period: "Février 2026", amount: "2 000 F", status: "À jour" }],
-  moussa: [{ period: "Mars 2026", amount: "2 000 F", status: "En retard" }, { period: "Février 2026", amount: "2 000 F", status: "En retard" }],
-  fatou: [{ period: "Mars 2026", amount: "2 000 F", status: "À jour" }, { period: "Février 2026", amount: "2 000 F", status: "À jour" }],
-};
 
 function loadLocal<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -190,6 +162,7 @@ export default function Home() {
 
   const memberSessionQuery = trpc.memberAuth.me.useQuery({ token: memberSessionToken || undefined });
   const hasMemberSession = Boolean(memberSessionQuery.data);
+  const memberName = memberSessionQuery.data?.name;
   const pendingAccountsQuery = trpc.memberAuth.pending.useQuery({ token: "cookie-session" }, { enabled: hasMemberSession && role === "admin" });
   const persistentMembersQuery = trpc.dahira.members.useQuery({ token: "cookie-session" }, { enabled: hasMemberSession });
   const dashboardQuery = trpc.dahira.dashboard.useQuery({ token: "cookie-session" }, { enabled: hasMemberSession });
@@ -483,14 +456,14 @@ export default function Home() {
                 <Bell className="h-5 w-5" />
                 <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#d06542]" />
               </button>
-              <button onClick={() => { setAccountMode("login"); setAccountNotice(""); setShowAccountPanel(true); }} className="hidden items-center gap-2 rounded-2xl border border-[#e5ddcd] bg-white px-2.5 py-2 sm:flex"><span className="grid h-7 w-7 place-items-center rounded-xl bg-[#e6efe7] text-[10px] font-bold text-[#165743]">AD</span><ChevronDown className="h-4 w-4 text-[#73877c]" /></button>
+              <button onClick={() => { setAccountMode("login"); setAccountNotice(""); setShowAccountPanel(true); }} aria-label={memberName ? `Compte de ${memberName}` : "Connexion à un compte membre"} className="hidden items-center gap-2 rounded-2xl border border-[#e5ddcd] bg-white px-2.5 py-2 sm:flex"><span className="grid h-7 w-7 place-items-center rounded-xl bg-[#e6efe7] text-[10px] font-bold text-[#165743]">{getMemberInitials(memberName)}</span><ChevronDown className="h-4 w-4 text-[#73877c]" /></button>
             </div>
           </header>
 
           {activeDataLoading && <div className="mb-5 flex items-center gap-3 rounded-2xl border border-[#e9dfcd] bg-[#fffaf0] px-4 py-3 text-sm font-medium text-[#6f7867]"><span className="h-4 w-4 animate-spin rounded-full border-2 border-[#0c5a48] border-t-transparent" />Mise à jour des informations du Dahira…</div>}
           {activeDataError && <div className="mb-5 rounded-2xl border border-[#f0d6cc] bg-[#fff4f0] px-4 py-3 text-sm text-[#9d513b]">Impossible de charger certaines informations. Vérifiez votre connexion puis réessayez.</div>}
 
-          {view === "dashboard" && <Dashboard role={role} hasMemberSession={hasMemberSession} isMemberPreview={isMemberPreview} organizer={organizer} metrics={dashboardMetrics} checkInOpen={checkInOpen} notificationsEnabled={notificationsEnabled} notificationFeedback={notificationFeedback} onNavigate={selectView} onEnableNotifications={() => void requestNotifications()} />}
+          {view === "dashboard" && <Dashboard role={role} memberName={memberName} hasMemberSession={hasMemberSession} isMemberPreview={isMemberPreview} organizer={organizer} metrics={dashboardMetrics} checkInOpen={checkInOpen} notificationsEnabled={notificationsEnabled} notificationFeedback={notificationFeedback} onNavigate={selectView} onEnableNotifications={() => void requestNotifications()} />}
           {view === "members" && <MembersPage members={filteredMembers} requests={accountRequests} search={search} onSearch={setSearch} onOpenAdd={() => setShowJoinForm(true)} onSelect={setSelectedMember} onApprove={approveRequest} onReject={rejectRequest} />}
           {view === "contributions" && <ContributionsPage canManage={role !== "member"} members={members} records={contributionQuery.data} onOpenRecord={() => { setRecordModal("contribution"); setRecordMemberId(""); setRecordAmount("2000"); }} remindedMembers={remindedMembers} onRemind={name => setRemindedMembers(previous => [...previous, name])} />}
           {view === "treasury" && <TreasuryPage canManage={role !== "member"} records={treasuryQuery.data} onOpenRecord={() => { setRecordModal("treasury"); setRecordAmount(""); setRecordCategory("Cotisation"); setRecordDescription(""); setRecordKind("income"); }} />}
@@ -520,9 +493,9 @@ export default function Home() {
   );
 }
 
-function Dashboard({ role, hasMemberSession, isMemberPreview, organizer, metrics, checkInOpen, notificationsEnabled, notificationFeedback, onNavigate, onEnableNotifications }: { role: AppRole; hasMemberSession: boolean; isMemberPreview: boolean; organizer: Member; metrics: { memberCount: number; received: number; expected: number; treasury: number; attendanceCount: number; paidCount: number; pendingCount: number; lateCount: number }; checkInOpen: boolean; notificationsEnabled: boolean; notificationFeedback: string; onNavigate: (view: View) => void; onEnableNotifications: () => void }) {
+function Dashboard({ role, memberName, hasMemberSession, isMemberPreview, organizer, metrics, checkInOpen, notificationsEnabled, notificationFeedback, onNavigate, onEnableNotifications }: { role: AppRole; memberName?: string; hasMemberSession: boolean; isMemberPreview: boolean; organizer: Member; metrics: { memberCount: number; received: number; expected: number; treasury: number; attendanceCount: number; paidCount: number; pendingCount: number; lateCount: number }; checkInOpen: boolean; notificationsEnabled: boolean; notificationFeedback: string; onNavigate: (view: View) => void; onEnableNotifications: () => void }) {
   return <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-    <div className="mb-7 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between"><div><p className="eyebrow">Bonjour, Abdou</p><h1 className="display mt-1 text-3xl tracking-tight text-[#123e32] sm:text-4xl">Le Dahira en un regard.</h1><p className="mt-2 max-w-xl text-sm leading-6 text-[#647a6f]">Suivez les activités, les cotisations et l’organisation du prochain Goudi Adjouma simplement.</p></div><button onClick={() => onNavigate("goudi")} className="soft-button w-fit bg-[#073d32] text-white shadow-[0_12px_20px_-15px_rgba(7,61,50,0.7)]">Préparer jeudi prochain <ArrowUpRight className="h-4 w-4" /></button></div>
+    <div className="mb-7 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between"><div><p className="eyebrow">Bonjour, {getMemberFirstName(memberName)}</p><h1 className="display mt-1 text-3xl tracking-tight text-[#123e32] sm:text-4xl">Le Dahira en un regard.</h1><p className="mt-2 max-w-xl text-sm leading-6 text-[#647a6f]">Suivez les activités, les cotisations et l’organisation du prochain Goudi Adjouma simplement.</p></div><button onClick={() => onNavigate("goudi")} className="soft-button w-fit bg-[#073d32] text-white shadow-[0_12px_20px_-15px_rgba(7,61,50,0.7)]">Préparer jeudi prochain <ArrowUpRight className="h-4 w-4" /></button></div>
 
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <Metric icon={Users} label="Membres actifs" value={String(metrics.memberCount)} note="comptes approuvés" tone="green" />

@@ -45,3 +45,5 @@ L’éditeur a conservé son état « No database selected » après l’instr
 La suppression qualifiée a réussi et a retiré exactement un compte technique. La base est de nouveau vierge de comptes membres : le premier compte réel créé dans l’application recevra donc bien le rôle administrateur.
 
 La migration `0004_old_misty_knight.sql` a été appliquée à TiDB Cloud : `goudiEvents.contributionExpected` ne possède plus de valeur par défaut. Chaque montant de Goudi Adjouma doit désormais être explicitement renseigné par un administrateur ou un trésorier.
+
+La pastille automatique « Powered by Netlify » a été désactivée dans les paramètres généraux du projet Netlify. Elle ne doit plus apparaître sur les pages publiques de Dahira Manager.
