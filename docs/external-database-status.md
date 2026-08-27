@@ -28,7 +28,7 @@ Les champs de responsabilité, d’activité et d’ordre de rotation ont été 
 
 La table `webPushSettings`, qui stocke les clés techniques des notifications web, a été créée avec succès.
 
-La table `webPushSubscriptions`, qui relie les navigateurs des membres à leurs notifications web, a été créée avec succès. Les tables métier nécessaires aux inscriptions, cotisations, caisse, Goudi, pointage et notifications sont maintenant initialisées dans le schéma de production.
+La table `webPushSubscriptions`, qui relie les navigateurs des membres à leurs notifications web, a été créée avec succès. Les tables métier nécessaires aux inscriptions, cotisations, caisse, Goudi Adjouma, pointage et notifications sont maintenant initialisées dans le schéma de production.
 
 Une requête de contrôle `SHOW TABLES` a confirmé la présence de huit tables applicatives : `memberAccounts`, `memberSessions`, `contributions`, `treasuryTransactions`, `goudiEvents`, `attendanceRecords`, `webPushSettings` et `webPushSubscriptions`. La table historique `users`, prévue pour l’ancienne connexion Manus OAuth, n’est pas requise par la fonction Netlify autonome et n’a donc pas été créée.
 
@@ -43,3 +43,5 @@ Le premier essai de suppression a été refusé par l’éditeur TiDB Cloud car 
 L’éditeur a conservé son état « No database selected » après l’instruction `USE`. La suppression est donc reprise avec le nom de table entièrement qualifié (`dahira_manager.memberAccounts`), ce qui ne dépend pas de la sélection visuelle d’un schéma.
 
 La suppression qualifiée a réussi et a retiré exactement un compte technique. La base est de nouveau vierge de comptes membres : le premier compte réel créé dans l’application recevra donc bien le rôle administrateur.
+
+La migration `0004_old_misty_knight.sql` a été appliquée à TiDB Cloud : `goudiEvents.contributionExpected` ne possède plus de valeur par défaut. Chaque montant de Goudi Adjouma doit désormais être explicitement renseigné par un administrateur ou un trésorier.

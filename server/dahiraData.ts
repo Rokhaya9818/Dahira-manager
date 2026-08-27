@@ -16,7 +16,8 @@ async function requireMember(token: string | undefined, cookieHeader?: string) {
   return account;
 }
 
-function requireTreasuryRole(role: MemberRole) { if (role !== "admin" && role !== "treasurer") throw new Error("Accès administrateur ou trésorier requis."); }
+export function canManageGoudi(role: MemberRole) { return role === "admin" || role === "treasurer"; }
+function requireTreasuryRole(role: MemberRole) { if (!canManageGoudi(role)) throw new Error("Accès administrateur ou trésorier requis."); }
 function requireAdminRole(role: MemberRole) { if (role !== "admin") throw new Error("Accès administrateur requis."); }
 function todayAtMidnight() { const date = new Date(); date.setHours(0, 0, 0, 0); return date; }
 
@@ -71,7 +72,7 @@ export const dahiraRouter = router({
     return { role: account.role, suggestedOrganizer, events };
   }),
   saveGoudi: publicProcedure.input(sessionInput.extend({ organizerAccountId: z.number().int().positive(), contributionExpected: z.number().int().positive(), scheduledFor: z.number().int().positive(), status: z.enum(["proposed", "confirmed", "completed"]) })).mutation(async ({ input, ctx }) => {
-    const account = await requireMember(input.token, ctx.req.headers.cookie); requireAdminRole(account.role as MemberRole); const db = await getDb(); if (!db) throw new Error("La base de données est indisponible."); await db.insert(goudiEvents).values({ organizerAccountId: input.organizerAccountId, contributionExpected: input.contributionExpected, scheduledFor: new Date(input.scheduledFor), status: input.status, createdByAccountId: account.id }); return { success: true } as const;
+    const account = await requireMember(input.token, ctx.req.headers.cookie); requireTreasuryRole(account.role as MemberRole); const db = await getDb(); if (!db) throw new Error("La base de données est indisponible."); await db.insert(goudiEvents).values({ organizerAccountId: input.organizerAccountId, contributionExpected: input.contributionExpected, scheduledFor: new Date(input.scheduledFor), status: input.status, createdByAccountId: account.id }); return { success: true } as const;
   }),
   attendance: publicProcedure.input(sessionInput.extend({ memberAccountId: z.number().int().positive().optional() })).query(async ({ input, ctx }) => {
     const account = await requireMember(input.token, ctx.req.headers.cookie); const db = await getDb(); if (!db) throw new Error("La base de données est indisponible."); const targetId = account.role === "member" ? account.id : input.memberAccountId; return targetId ? db.select().from(attendanceRecords).where(eq(attendanceRecords.memberAccountId, targetId)).orderBy(desc(attendanceRecords.eventDate)) : db.select().from(attendanceRecords).orderBy(desc(attendanceRecords.eventDate));

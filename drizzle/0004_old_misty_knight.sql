@@ -1,0 +1,1 @@
+ALTER TABLE `goudiEvents` MODIFY COLUMN `contributionExpected` int NOT NULL;

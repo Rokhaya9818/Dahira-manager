@@ -27,7 +27,7 @@ pnpm build
 
 ## Déploiement Netlify
 
-Le projet contient maintenant une fonction Netlify Express dans `netlify/functions/api.ts`. Le fichier `netlify.toml` publie `dist/public`, construit cette fonction et redirige les appels `/api/*` vers elle. Les inscriptions, comptes approuvés, données financières, Goudi, présences et abonnements Push peuvent ainsi être traités côté serveur sur Netlify.
+Le projet contient maintenant une fonction Netlify Express dans `netlify/functions/api.ts`. Le fichier `netlify.toml` publie `dist/public`, construit cette fonction et redirige les appels `/api/*` vers elle. Les inscriptions, comptes approuvés, données financières, Goudi Adjouma, présences et abonnements Push peuvent ainsi être traités côté serveur sur Netlify.
 
 Avant de déployer, créez une base MySQL ou TiDB accessible depuis Netlify et définissez les variables suivantes dans **Site configuration → Environment variables** :
 
@@ -42,4 +42,4 @@ Pour le déploiement depuis GitHub, créez un dépôt, poussez ce code, puis cr�
 
 ## Décisions produit
 
-Le pointage est facultatif et n’est pas une sanction. Il est uniquement visible le jeudi de 21 h à 23 h 59 et sert à observer la régularité de manière bienveillante. Le Goudi Adjouma est suggéré automatiquement, mais l’administrateur peut toujours confirmer ou modifier le choix.
+Le pointage est facultatif et n’est pas une sanction. Il est uniquement visible le jeudi de 21 h à 23 h 59 et sert à observer la régularité de manière bienveillante. Le Goudi Adjouma est suggéré automatiquement, mais l’administrateur ou le trésorier peut confirmer ou modifier le choix et renseigner son montant.

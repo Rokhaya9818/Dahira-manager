@@ -57,3 +57,7 @@
 - [x] Déployer Dahira Manager sur Netlify et vérifier l’URL publique.
 - [x] Corriger le bundling des dépendances de la fonction API Netlify et vérifier l’accès tRPC publié.
 - [x] Corriger la réécriture tRPC entre les routes publiques `/api/*` et la fonction Netlify publiée.
+- [x] Retirer le montant Goudi prédéfini de 10 000 F et le rendre saisissable uniquement par l’administrateur ou le trésorier.
+- [x] Remplacer l’intitulé « Goudi » par « Goudi Adjouma » dans l’interface, les messages et la documentation visible.
+- [x] Remplacer les dernières mentions visibles de « Goudi » dans le tableau de bord, l’aperçu membre et les messages secondaires.
+- [x] Auditer les documents visibles afin de supprimer les libellés « Goudi » résiduels avant la publication.

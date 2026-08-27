@@ -6,7 +6,7 @@ Le tableau de bord a été revu sur un écran téléphone de 390 × 844 pixels e
 
 ## Ajustements appliqués
 
-Sur téléphone, la navigation principale est déplacée dans une barre inférieure et les écrans secondaires sont accessibles depuis le panneau « Plus ». Les indicateurs passent sur une seule colonne afin de conserver une largeur de lecture confortable. Les boutons de pointage, de notification et de préparation du Goudi sont dimensionnés pour une utilisation tactile.
+Sur téléphone, la navigation principale est déplacée dans une barre inférieure et les écrans secondaires sont accessibles depuis le panneau « Plus ». Les indicateurs passent sur une seule colonne afin de conserver une largeur de lecture confortable. Les boutons de pointage, de notification et de préparation du Goudi Adjouma sont dimensionnés pour une utilisation tactile.
 
 Sur bureau, une navigation latérale persistante est affichée et le tableau de bord se réorganise en grilles de deux à quatre colonnes. Les tableaux disposent d’un défilement horizontal lorsqu’ils dépassent la largeur disponible, ce qui évite de masquer les colonnes importantes.
 

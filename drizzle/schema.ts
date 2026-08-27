@@ -74,7 +74,7 @@ export const goudiEvents = mysqlTable("goudiEvents", {
   id: int("id").autoincrement().primaryKey(),
   scheduledFor: timestamp("scheduledFor").notNull(),
   organizerAccountId: int("organizerAccountId"),
-  contributionExpected: int("contributionExpected").default(10000).notNull(),
+  contributionExpected: int("contributionExpected").notNull(),
   status: mysqlEnum("status", ["proposed", "confirmed", "completed"]).default("proposed").notNull(),
   createdByAccountId: int("createdByAccountId").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
