@@ -61,5 +61,5 @@
 - [x] Remplacer l’intitulé « Goudi » par « Goudi Adjouma » dans l’interface, les messages et la documentation visible.
 - [x] Remplacer les dernières mentions visibles de « Goudi » dans le tableau de bord, l’aperçu membre et les messages secondaires.
 - [x] Auditer les documents visibles afin de supprimer les libellés « Goudi » résiduels avant la publication.
-- [ ] Remplacer les éléments visuels d’exemple « Abdou/AD » par le compte réellement connecté ou un état neutre.
-- [ ] Identifier et retirer toute mention « Powered by Netlify » visible dans l’application publiée.
+- [x] Remplacer les éléments visuels d’exemple « Abdou/AD » par le compte réellement connecté ou un état neutre.
+- [x] Identifier et retirer toute mention « Powered by Netlify » visible dans l’application publiée.
